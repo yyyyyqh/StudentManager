@@ -60,8 +60,6 @@ public class StudentManager {
                     System.out.println("See you.");
                     System.exit(0);
             }
-
-
         }
     }
 
@@ -84,7 +82,6 @@ public class StudentManager {
         System.out.println("成功添加: " + student.getSid() + " " + student.getName() + " " + student.getAge() +
                 " " + student.getAddress());
     }
-
     /**
      * 后期可优化。
      */
