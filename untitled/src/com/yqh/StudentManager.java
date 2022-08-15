@@ -9,7 +9,6 @@ public class StudentManager {
 
 
     public static void main(String[] args) {
-
         List<Student> list  = new ArrayList<>();
 
         // initialize
@@ -18,25 +17,14 @@ public class StudentManager {
         list.add(student);
 
         //简单界面
-        System.out.println("Please enter the following numbers (1-5):");
-        System.out.println("1. Add student.");
-        System.out.println("2. Remove student.");
-        System.out.println("3. Update Info.");
-        System.out.println("4. Show all student Info.");
-        System.out.println("5. Exit.");
-        System.out.print("Input > ");
+        System.out.println("————————————————学生管理系统————————————————");
+        choiceMenu();
 
         //接收输入处理
         int index = 0;
         while(true){
             if(index > 0){
-                System.out.println("Please enter the following numbers (1-5):");
-                System.out.println("1. Add student.");
-                System.out.println("2. Remove student.");
-                System.out.println("3. Update Info.");
-                System.out.println("4. Show all student Info.");
-                System.out.println("5. Exit.");
-                System.out.print("Input > ");
+                choiceMenu();
             }
             index++;
 
@@ -44,27 +32,15 @@ public class StudentManager {
             String choice = scanner.nextLine();
 
             switch (choice){
-                case "1":
-                    addStudent(list);
-                    break;
-                case "2":
-                    removeStudent(list);
-                    break;
-                case "3":
-                    updateStudent(list);
-                    break;
-                case "4":
-                    showInfo(list);
-                    break;
-                case "5":
-                    System.out.println("See you.");
-                    System.exit(0);
+                case "1" ->  addStudent(list);
+                case "2" -> removeStudent(list);
+                case "3" -> updateStudent(list);
+                case "4" -> showInfo(list);
+                case "5" -> seeyou();
+                default -> System.out.println("请重新输入");
             }
-
-
         }
     }
-
     private static void addStudent(List<Student> list){
         // 获取新数据，填入Student类
         Scanner scanner = new Scanner(System.in);
@@ -88,7 +64,6 @@ public class StudentManager {
     /**
      * 后期可优化。
      */
-
     private static void removeStudent(List<Student> list){
         System.out.println("当前保存人数：" + list.size());
 
@@ -150,7 +125,7 @@ public class StudentManager {
                             list.set(i, s3);
                             break;
                         case "age":
-                            Student s = new Student(tmp.getSid(), tmp.getName(), tmp.getAddress(), Integer.valueOf(fill));
+                            Student s = new Student(tmp.getSid(), tmp.getName(), tmp.getAddress(), Integer.parseInt(fill));
                             list.set(i, s);
                             break;
                         default:
@@ -180,7 +155,7 @@ public class StudentManager {
      */
     private static void showInfo(List<Student> list){
         for(int i = 0; i < list.size(); i++){
-            System.out.println(String.valueOf(i + 1) + ". " +
+            System.out.println((i + 1) + ". " +
                     list.get(i).getSid() + " " +
                     list.get(i).getName() + " " +
                     list.get(i).getAge() + " " +
@@ -210,8 +185,8 @@ public class StudentManager {
             FileInputStream is = new FileInputStream(file);
             InputStreamReader isr = new InputStreamReader(is);
             BufferedReader in = new BufferedReader(isr);
-            String line = null;
-            String[] words = null;
+            String line;
+            String[] words;
             while( (line = in.readLine()) != null){
                 //使用':'作为单个数据的划分依据
                 words = line.split(":");
@@ -222,7 +197,7 @@ public class StudentManager {
                 stu.setSid(words[0]);
                 stu.setName(words[1]);
                 stu.setAddress(words[2]);
-                stu.setAge(Integer.valueOf(words[3]));
+                stu.setAge(Integer.parseInt(words[3]));
 
                 list.add(stu);
             }
@@ -232,5 +207,20 @@ public class StudentManager {
             e.printStackTrace();
         }
 
+    }
+
+    private static void choiceMenu(){
+        System.out.println("Please enter the following numbers (1-5):");
+        System.out.println("1. Add student.");
+        System.out.println("2. Remove student.");
+        System.out.println("3. Update Info.");
+        System.out.println("4. Show all student Info.");
+        System.out.println("5. Exit.");
+        System.out.print("Input > ");
+    }
+
+    private static void seeyou(){
+        System.out.println("See you.");
+        System.exit(0);
     }
 }
