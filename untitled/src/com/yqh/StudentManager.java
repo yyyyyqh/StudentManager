@@ -9,10 +9,11 @@ public class StudentManager {
 
 
     public static void main(String[] args) {
+        File file = new File("test1.txt");
         List<Student> list  = new ArrayList<>();
 
         // initialize
-        init(list);
+        init(list, file);
         Student student = new Student("213030534", "admin", "address", 20);
         list.add(student);
 
@@ -32,7 +33,7 @@ public class StudentManager {
             String choice = scanner.nextLine();
 
             switch (choice){
-                case "1" ->  addStudent(list);
+                case "1" ->  addStudent(list, file);
                 case "2" -> removeStudent(list);
                 case "3" -> updateStudent(list);
                 case "4" -> showInfo(list);
@@ -41,7 +42,7 @@ public class StudentManager {
             }
         }
     }
-    private static void addStudent(List<Student> list){
+    private static void addStudent(List<Student> list, File filepath){
         // 获取新数据，填入Student类
         Scanner scanner = new Scanner(System.in);
         System.out.println("Input name: ");
@@ -52,10 +53,22 @@ public class StudentManager {
         String address = scanner.nextLine();
         System.out.println("Input age: ");
         int age = scanner.nextInt();
-
+        
+        // 使用输入流，附加新建的数据到test1.txt文件
         Student student = new Student(sid, name, address, age);
         list.add(student);
         //文件里也要add一份，文件的输入
+        try{
+            //<bug> 中文输入乱码
+            FileOutputStream fos = new FileOutputStream(filepath, true);
+            fos.write(('\n' + student.getSid() + ":" +
+                student.getName() + ":" +
+                student.getAddress() + ":" +  
+                student.getAge()).getBytes());
+            fos.close();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
 
         System.out.println("成功添加: " + student.getSid() + " " + student.getName() + " " + student.getAge() +
                 " " + student.getAddress());
@@ -158,7 +171,7 @@ public class StudentManager {
             System.out.println((i + 1) + ". " +
                     list.get(i).getSid() + " " +
                     list.get(i).getName() + " " +
-                    list.get(i).getAge() + " " +
+                    list.get(i).getAddress() + " " +
                     list.get(i).getAge());
         }
         System.out.println();
@@ -176,13 +189,13 @@ public class StudentManager {
         }
         return false;
     }
-    private static void init(List<Student> list){
+    private static void init(List<Student> list, File filepath){
         //外部定义，以供内部使用
         Student stu;
-        File file = new File("test1.txt");
+        
 
         try{
-            FileInputStream is = new FileInputStream(file);
+            FileInputStream is = new FileInputStream(filepath);
             InputStreamReader isr = new InputStreamReader(is);
             BufferedReader in = new BufferedReader(isr);
             String line;
