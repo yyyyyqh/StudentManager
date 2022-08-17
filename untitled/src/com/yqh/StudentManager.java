@@ -8,14 +8,14 @@ import java.util.Scanner;
 public class StudentManager {
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException{
         File file = new File("test1.txt");
         List<Student> list  = new ArrayList<>();
 
         // initialize
         init(list, file);
-        Student student = new Student("213030534", "admin", "address", 20);
-        list.add(student);
+        //Student student = new Student("213030534", "admin", "address", 20);
+        //list.add(student);
 
         //简单界面
         System.out.println("————————————————学生管理系统————————————————");
@@ -34,37 +34,34 @@ public class StudentManager {
 
             switch (choice){
                 case "1" ->  addStudent(list, file);
-                case "2" -> removeStudent(list);
+                case "2" -> removeStudent(list, file);
                 case "3" -> updateStudent(list);
                 case "4" -> showInfo(list);
-                case "5" -> seeyou();
+                case "5" -> byeBye(scanner);
                 default -> System.out.println("请重新输入");
             }
         }
     }
     private static void addStudent(List<Student> list, File filepath){
-        // 获取新数据，填入Student类
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Input name: ");
-        String name = scanner.nextLine();
         System.out.println("Input sid: ");
         String sid = scanner.nextLine();
+        System.out.println("Input name: ");
+        String name = scanner.nextLine();
         System.out.println("Input address: ");
         String address = scanner.nextLine();
-        System.out.println("Input age: ");
+        System.out.println("Input Integer:");
         int age = scanner.nextInt();
         
-        // 使用输入流，附加新建的数据到test1.txt文件
         Student student = new Student(sid, name, address, age);
         list.add(student);
-        //文件里也要add一份，文件的输入
         try{
-            //<bug> 中文输入乱码
+            //注意命令行Gbk和Editor UTf8格式之间转换会出现乱码
             FileOutputStream fos = new FileOutputStream(filepath, true);
-            fos.write(('\n' + student.getSid() + ":" +
-                student.getName() + ":" +
-                student.getAddress() + ":" +  
-                student.getAge()).getBytes());
+            fos.write(('\n' + sid + ":" +
+                name + ":" +
+                address + ":" +  
+                age).getBytes());
             fos.close();
         }catch(IOException e){
             e.printStackTrace();
@@ -77,29 +74,62 @@ public class StudentManager {
     /**
      * 后期可优化。
      */
-    private static void removeStudent(List<Student> list){
+    private static void removeStudent(List<Student> list, File inputFile) throws IOException{
+        File tempFile = new File("tmp.txt");
+
+        BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+        BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
+        
         System.out.println("当前保存人数：" + list.size());
 
-        //如果遍历完都没找到，那么没有该学号（flag == true）
         boolean flag = false;
         System.out.println("Please enter your sid to delete this Info.");
 
         Scanner scanner = new Scanner(System.in);
         String inputSid = scanner.nextLine();
 
-        // for循环遍历，找到-删除
-        for(int i = 0; i < list.size(); i++){
+        String currentString;
+        String[] firstField;
+
+        int i = 0;
+        while( (currentString = reader.readLine()) != null){
+            String trimmedLine = currentString.trim();
+            firstField = trimmedLine.split(":");
+
+            // firstField = currentString.split(":");
+
             Student tmp = list.get(i);
-            if(tmp.getSid().equals(inputSid)){
-                list.remove(i);
+            
+            if(firstField[0].equals(inputSid)){
                 flag = true;
-                System.out.println("成功删除:" + tmp.getSid() + tmp.getName() + "!!!");
-                break;
+                list.remove(i); //remove后list的index值也需要处理，会减一
+                System.out.println("成功删除:" + tmp.getSid() + " " +tmp.getName() + "!");
+                System.out.println("当前剩余人数：" + list.size());
+                System.out.println();
+                // 跳过'i'计数，和文件输入
+                continue;
             }
+            writer.write(currentString + System.getProperty("line.separator"));
+            i++;
         }
+        writer.close(); 
+        reader.close(); 
+        inputFile.delete();
+        tempFile.renameTo(inputFile);
+        //删除
+        // for(int i = 0; i < list.size(); i++){
+        //     Student tmp = list.get(i);
+        //     if(tmp.getSid().equals(inputSid)){
+        //         list.remove(i);
+        //         flag = true;
+        //         System.out.println("成功删除:" + tmp.getSid() + tmp.getName() + "!!!");
+        //         System.out.println("当前剩余人数：" + list.size());
+        //         break;
+        //     }
+        // }
         if(!flag){
             System.out.println("没找到这个人。");
-        }
+        }        
     }
 
     /**
@@ -192,7 +222,6 @@ public class StudentManager {
     private static void init(List<Student> list, File filepath){
         //外部定义，以供内部使用
         Student stu;
-        
 
         try{
             FileInputStream is = new FileInputStream(filepath);
@@ -215,25 +244,24 @@ public class StudentManager {
                 list.add(stu);
             }
 
-
         }catch (IOException e){
             e.printStackTrace();
         }
-
     }
 
     private static void choiceMenu(){
         System.out.println("Please enter the following numbers (1-5):");
         System.out.println("1. Add student.");
         System.out.println("2. Remove student.");
-        System.out.println("3. Update Info.");
-        System.out.println("4. Show all student Info.");
+        System.out.println("3. Update Information.");
+        System.out.println("4. Show all student Information.");
         System.out.println("5. Exit.");
         System.out.print("Input > ");
     }
 
-    private static void seeyou(){
+    private static void byeBye(Scanner scanner){
         System.out.println("See you.");
         System.exit(0);
+        scanner.close();
     }
 }
